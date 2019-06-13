@@ -3,26 +3,31 @@
 A group of simple methods that solves routine problem: run several api requests in parallel and then combine their results.
 
 ```swift
-let tariffRequest: (@escaping (Result<String, ApiError>) -> Void) -> Void = {
-    moyaProvider.loadTariff(completion: $0)
-}
-
 let profileRequest: (@escaping (Result<String, ApiError>) -> Void) -> Void = {
-    moyaProvider.loadProfile(completion: $0)
+    apiManager.loadProfile(completion: $0)
 }
 
-let authInfoRequest: (@escaping (Result<String, ApiError>) -> Void) -> Void = {
-    moyaProvider.obtainAuthInfo(completion: $0)
+let balanceRequest: (@escaping (Result<String, ApiError>) -> Void) -> Void = {
+    apiManager.loadBalance(completion: $0)
 }
 
-ParrallelActions.combine(tariffRequest, profileRequest, authInfoRequest) { tariff, profile, authInfo in
-        let finalResult = combinedSuccess(of: tariff, profile, authInfo)
+let tariffRequest: (@escaping (Result<String, ApiError>) -> Void) -> Void = {
+    apiManager.loadTariff(completion: $0)
+}
+
+let offersRequest: (@escaping (Result<String, ApiError>) -> Void) -> Void = {
+    apiManager.obtainSpecialOffers(completion: $0)
+}
+
+ParrallelActions
+        .combine(profileRequest, balanceRequest, tariffRequest, offersRequest) { profile, balance, tariff, offers in
+        let finalResult = combinedSuccess(of: profile, balance, tariff, offers)
         
         switch finalResult {
         case .failure(let error):
             print(error)
-        case let .success(tariff, profile, authInfo):
-            print("Simple combine: \(tariff), \(profile), \(authInfo)")
+        case let .success(profile, balance, tariff, offers):
+            print("Simple combine: \(profile), \(balance), \(tariff), \(offers)")
         }
     }
 ```

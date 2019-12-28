@@ -31,3 +31,5 @@ ParrallelActions
         }
     }
 ```
+
+Detailed description: https://medium.com/@dy.ignatyev/combining-parallel-network-requests-ee60fb85369
